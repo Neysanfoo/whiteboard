@@ -1,0 +1,30 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: boarder-box;
+}
+
+#canvas {
+  border: 2px solid black;
+}
+
+.tools {
+  display: flex;
+  justify-content: left;
+  flex-direction: row;
+  margin: 15px 15px;
+}
+div.pen-colour {
+  height: 40px;
+  width: 40px;
+  min-height: 40px;
+  min-width: 40px;
+  cursor: pointer;
+  display: inline-block;
+  border-radius: 50%;
+  margin: 0px 5px;
+}
+
+.btn-primary {
+  margin: 0px 5px;
+}

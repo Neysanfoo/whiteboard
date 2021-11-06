@@ -1,14 +1,18 @@
 let drawColour = "black";
-let drawWidth = 10;
+let drawWidth = 5;
 let whiteboardColour = "white";
 
+// TODO Fix pen breaking after resize
 window.addEventListener("resize", resizeCanvas, false);
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 100;
+  context.lineJoin = "round";
+  context.lineCap = "round";
   context.putImageData(restoreArray[index], 0, 0);
 }
 
+// Select Pen Colour
 function changeColour(element) {
   drawColour = element.style.background;
 }
@@ -100,7 +104,6 @@ function up(evt) {
 
   restoreArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
   index += 1;
-  console.log(restoreArray);
 }
 
 function getPos(evt) {

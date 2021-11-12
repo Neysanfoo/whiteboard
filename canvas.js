@@ -2,14 +2,15 @@ let drawColour = "black";
 let drawWidth = 5;
 let whiteboardColour = "white";
 
-// TODO Fix pen breaking after resize
 window.addEventListener("resize", resizeCanvas, false);
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 100;
   context.lineJoin = "round";
   context.lineCap = "round";
-  context.putImageData(restoreArray[index], 0, 0);
+  if (index > -1) {
+    context.putImageData(undoStack[index], 0, 0);
+  }
 }
 
 // Select Pen Colour
@@ -21,25 +22,43 @@ function clearCanvas() {
   context.fillStyle = whiteboardColour;
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillRect(0, 0, canvas.width, canvas.height);
-  restoreArray = [];
+  undoStack = [];
   index = -1;
 }
 
-let restoreArray = [];
+let undoStack = [];
+let redoStack = [];
 let index = -1;
 
 function undoLast() {
   if (index <= 0) {
+    redoStack.push(undoStack.pop());
     clearCanvas();
   } else {
     index -= 1;
-    restoreArray.pop();
-    context.putImageData(restoreArray[index], 0, 0);
+    redoStack.push(undoStack.pop());
+    context.putImageData(undoStack[index], 0, 0);
   }
+  console.log("undo stack:", undoStack);
+  console.log("redo stack: ", redoStack);
 }
+
+// Keybindings for undo and redo
 Mousetrap.bind(["ctrl+z", "command+z"], function () {
   undoLast();
 });
+Mousetrap.bind(["ctrl+shift+z", "command+shift+z"], function () {
+  redoLast();
+});
+
+function redoLast() {
+  if (redoStack.length != 0) {
+    undoStack.push(redoStack.pop());
+    index += 1;
+    console.log(redoStack);
+    context.putImageData(undoStack[index], 0, 0);
+  }
+}
 
 const canvas = document.querySelector("#canvas");
 const context = canvas.getContext("2d");
@@ -102,8 +121,11 @@ function up(evt) {
   isDown = false;
   points = [];
 
-  restoreArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
+  undoStack.push(context.getImageData(0, 0, canvas.width, canvas.height));
   index += 1;
+  redoStack = [];
+  console.log("undoStack: ", undoStack);
+  console.log("redoStack: ", redoStack);
 }
 
 function getPos(evt) {
